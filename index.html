@@ -4,8 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>WOPPERS</title>
-        <link rel="stylesheet" href="https://missiveapp.com/open/missive.css" />
-        <style></style>
+        <link
+            href="https://integrations.missiveapp.com/missive.css"
+            rel="stylesheet"
+        />
     </head>
     <body>
         <div class="tabs-container">
@@ -23,15 +25,28 @@
                 </div>
             </div>
             <div class="tabs-content light-box padding">
-                <div>Conversation Id: <span id="conversationId"></span></div>
+                <div>Conversation Id: <span id="conversation-id"></span></div>
             </div>
         </div>
         <script src="https://missiveapp.com/open/missive.js"></script>
         <script>
-            document.addEventListener('missive:load', function () {
-                const conversationId = Missive.conversation.id;
-                document.getElementById('conversationId').textContent =
-                    conversationId;
+            // Wait for the Missive API to be ready
+            missive.onReady(() => {
+                // Get the current conversation
+                const conversation = missive.conversation;
+
+                // Check if the conversation is available
+                if (conversation) {
+                    // Get the conversation ID
+                    const conversationId = conversation.id;
+
+                    // Display the conversation ID in your iFrame app
+                    document.getElementById(
+                        'conversation-id'
+                    ).innerText = `Conversation ID: ${conversationId}`;
+                } else {
+                    console.log('No conversation found.');
+                }
             });
         </script>
     </body>
