@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WOPPERS - Customer & Order Info</title>
+        <link
+            rel="stylesheet"
+            href="https://integrations.missiveapp.com/styleguide.css"
+        />
+        <style>
+            .info-container {
+                margin: 20px;
+            }
+            .section {
+                margin-bottom: 15px;
+            }
+            .section h3 {
+                margin: 0 0 10px;
+                font-size: 1.2em;
+            }
+            .info-item {
+                background-color: var(--color-background-secondary);
+                border: 1px solid var(--color-border);
+                border-radius: var(--border-radius);
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            .info-item p {
+                margin: 5px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="info-container">
+            <div class="section">
+                <h3>Customer Information</h3>
+                <div id="customer-info" class="info-item">Loading...</div>
+            </div>
+            <div class="section">
+                <h3>Order Information</h3>
+                <div id="order-info" class="info-item">Loading...</div>
+            </div>
+        </div>
+        <script>
+            async function fetchCustomerAndOrderInfo() {
+                const emailId = new URLSearchParams(window.location.search).get(
+                    'emailId'
+                );
+                if (!emailId) {
+                    document.getElementById('customer-info').textContent =
+                        'Email ID not found';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(
+                        `/api/customer-info?emailId=${emailId}`,
+                        {
+                            headers: {
+                                'Missive-Auth': 'YOUR_AUTH_TOKEN', // Replace with actual token handling
+                            },
+                        }
+                    );
+
+                    const data = await response.json();
+                    document.getElementById('customer-info').innerHTML =
+                        data.customerInfo
+                            ? `<p>Name: ${data.customerInfo.name}</p><p>Email: ${data.customerInfo.email}</p>`
+                            : 'Customer info not available';
+
+                    document.getElementById('order-info').innerHTML =
+                        data.orderInfo
+                            ? `<p>Order ID: ${data.orderInfo.id}</p><p>Status: ${data.orderInfo.status}</p>`
+                            : 'Order info not available';
+                } catch (error) {
+                    document.getElementById('customer-info').textContent =
+                        'Error fetching information';
+                    document.getElementById('order-info').textContent =
+                        'Error fetching information';
+                }
+            }
+
+            fetchCustomerAndOrderInfo();
+        </script>
+    </body>
+</html>
