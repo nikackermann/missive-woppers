@@ -3,100 +3,35 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Missive Task Manager</title>
+        <title>WOPPERS</title>
         <link rel="stylesheet" href="https://missiveapp.com/open/missive.css" />
-        <script src="https://missiveapp.com/open/missive.js"></script>
-        <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-                    Roboto, Helvetica, Arial, sans-serif;
-                padding: 20px;
-            }
-            #task-list {
-                margin-top: 20px;
-            }
-            .task-item {
-                margin-bottom: 10px;
-            }
-        </style>
+        <style></style>
     </head>
     <body>
-        <h1 class="m-title">Missive Task Manager</h1>
-
-        <div class="m-form-group">
-            <label for="task-input" class="m-label">New Task</label>
-            <input
-                type="text"
-                id="task-input"
-                class="m-input"
-                placeholder="Enter a new task"
-            />
+        <div class="tabs-container">
+            <div class="columns-middle">
+                <div class="tabs light-box columns">
+                    <div class="tab tab--selected">
+                        <span>Customer</span>
+                    </div>
+                    <div class="tab">
+                        <span>Orders</span>
+                    </div>
+                    <div class="tab">
+                        <span>More</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs-content light-box padding">
+                <div>Conversation Id: <span id="conversationId"></span></div>
+            </div>
         </div>
-
-        <div class="m-form-group">
-            <label for="priority-select" class="m-label">Priority</label>
-            <select id="priority-select" class="m-select">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-        </div>
-
-        <button id="add-task" class="m-button m-button--primary">
-            Add Task
-        </button>
-
-        <div id="task-list"></div>
-
+        <script src="https://missiveapp.com/open/missive.js"></script>
         <script>
-            const taskInput = document.getElementById('task-input');
-            const prioritySelect = document.getElementById('priority-select');
-            const addTaskButton = document.getElementById('add-task');
-            const taskList = document.getElementById('task-list');
-
-            addTaskButton.addEventListener('click', addTask);
-
-            function addTask() {
-                const taskText = taskInput.value.trim();
-                const priority = prioritySelect.value;
-
-                if (taskText) {
-                    const taskItem = document.createElement('div');
-                    taskItem.className = 'task-item';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'm-checkbox';
-
-                    const label = document.createElement('label');
-                    label.className = 'm-label';
-                    label.appendChild(checkbox);
-
-                    const taskSpan = document.createElement('span');
-                    taskSpan.textContent = taskText;
-                    label.appendChild(taskSpan);
-
-                    taskItem.appendChild(label);
-
-                    const priorityBadge = document.createElement('span');
-                    priorityBadge.className = `m-badge m-badge--${priority}`;
-                    priorityBadge.textContent =
-                        priority.charAt(0).toUpperCase() + priority.slice(1);
-                    taskItem.appendChild(priorityBadge);
-
-                    taskList.appendChild(taskItem);
-
-                    taskInput.value = '';
-                    prioritySelect.value = 'low';
-
-                    Missive.setSize();
-                }
-            }
-
-            // Initialize Missive
-            Missive.on('ready', function () {
-                console.log('Missive is ready');
-                Missive.setSize();
+            document.addEventListener('missive:load', function () {
+                const conversationId = Missive.conversation.id;
+                document.getElementById('conversationId').textContent =
+                    conversationId;
             });
         </script>
     </body>
