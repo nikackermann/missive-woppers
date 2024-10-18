@@ -16,6 +16,14 @@
             rel="stylesheet"
         />
         <script src="https://integrations.missiveapp.com/missive.js"></script>
+        <style>
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+        </style>
         <script>
             Missive.on('change:conversations', (ids) => {
                 Missive.fetchConversations(ids).then((conversations) => {
@@ -43,16 +51,75 @@
                         message.subject;
                 });
             });
+
+            Missive.on('change:folder', (folder) => {
+                document.getElementById('folderId').textContent = folder.id;
+            });
+
+            function switchTab(tabName) {
+                // Hide all tab contents
+                var tabContents =
+                    document.getElementsByClassName('tab-content');
+                for (var i = 0; i < tabContents.length; i++) {
+                    tabContents[i].classList.remove('active');
+                }
+
+                // Show the selected tab content
+                document.getElementById(tabName).classList.add('active');
+
+                // Update tab styles
+                var tabs = document.getElementsByClassName('tab');
+                for (var i = 0; i < tabs.length; i++) {
+                    tabs[i].classList.remove('tab--selected');
+                }
+                document
+                    .querySelector(`[onclick="switchTab('${tabName}')"]`)
+                    .classList.add('tab--selected');
+            }
         </script>
     </head>
     <body>
-        <div id="messageInfo">
-            <p>Conversation ID: <span id="conversationId"></span></p>
-            <p>
-                From: <span id="fromName"></span> (<span id="fromAddress"></span
-                >)
-            </p>
-            <p>Subject: <span id="subject"></span></p>
+        <div class="tabs-container">
+            <div class="columns-middle">
+                <div class="tabs light-box columns">
+                    <div
+                        class="tab tab--selected"
+                        onclick="switchTab('folderInfo')"
+                    >
+                        <span>Folder Info</span>
+                    </div>
+                    <div class="tab" onclick="switchTab('developer')">
+                        <span>Developer</span>
+                    </div>
+                    <div class="tab" onclick="switchTab('more')">
+                        <span>More</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs-content light-box padding">
+                <div id="folderInfo" class="tab-content active">
+                    <div id="messageInfo">
+                        <p>Folder: <span id="folderId"></span></p>
+                    </div>
+                </div>
+                <div id="developer" class="tab-content">
+                    <div id="messageInfo">
+                        <p>
+                            Conversation ID: <span id="conversationId"></span>
+                        </p>
+                        <p>
+                            From: <span id="fromName"></span> (<span
+                                id="fromAddress"
+                            ></span
+                            >)
+                        </p>
+                        <p>Subject: <span id="subject"></span></p>
+                    </div>
+                </div>
+                <div id="more" class="tab-content">
+                    <p>Placeholder for additional information.</p>
+                </div>
+            </div>
         </div>
     </body>
 </html>
