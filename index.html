@@ -9,25 +9,59 @@
             href="https://integrations.missiveapp.com/styleguide.css"
         />
         <style>
+            body {
+                background-color: var(--color-background);
+                color: var(--color-text);
+                font-family: var(--font-family);
+            }
             .info-container {
-                margin: 20px;
-            }
-            .section {
-                margin-bottom: 15px;
-            }
-            .section h3 {
-                margin: 0 0 10px;
-                font-size: 1.2em;
-            }
-            .info-item {
+                padding: 20px;
+                border-radius: var(--border-radius);
                 background-color: var(--color-background-secondary);
                 border: 1px solid var(--color-border);
+            }
+            .section {
+                margin-bottom: 20px;
+            }
+            .section h3 {
+                font-size: 1.2em;
+                color: var(--color-text-secondary);
+                border-bottom: 1px solid var(--color-border);
+                padding-bottom: 5px;
+            }
+            .info-item {
+                padding: 15px;
                 border-radius: var(--border-radius);
-                padding: 10px;
+                background-color: var(--color-background-tertiary);
+                border: 1px solid var(--color-border);
                 margin-bottom: 10px;
+                box-shadow: var(--box-shadow);
             }
             .info-item p {
                 margin: 5px 0;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px 15px;
+                background-color: var(--color-primary);
+                color: var(--color-on-primary);
+                border: none;
+                border-radius: var(--border-radius);
+                cursor: pointer;
+                font-size: 1em;
+                text-align: center;
+                transition: background-color 0.3s;
+            }
+            .button:hover {
+                background-color: var(--color-primary-hover);
+            }
+            .button:active {
+                background-color: var(--color-primary-active);
+            }
+            .button-secondary {
+                background-color: var(--color-background-secondary);
+                color: var(--color-text);
+                border: 1px solid var(--color-border);
             }
         </style>
     </head>
@@ -40,6 +74,14 @@
             <div class="section">
                 <h3>Order Information</h3>
                 <div id="order-info" class="info-item">Loading...</div>
+            </div>
+            <div class="section">
+                <button class="button" onclick="refreshData()">
+                    Refresh Data
+                </button>
+                <button class="button button-secondary" onclick="sendEmail()">
+                    Send Email
+                </button>
             </div>
         </div>
         <script>
@@ -71,7 +113,7 @@
 
                     document.getElementById('order-info').innerHTML =
                         data.orderInfo
-                            ? `<p>Order ID: ${data.orderInfo.id}</p><p>Status: ${data.orderInfo.status}</p>`
+                            ? `<p>Order ID: ${data.orderInfo.id}</p><p>Status: ${data.orderInfo.status}</p><p>Total: ${data.orderInfo.total}</p>`
                             : 'Order info not available';
                 } catch (error) {
                     document.getElementById('customer-info').textContent =
@@ -79,6 +121,14 @@
                     document.getElementById('order-info').textContent =
                         'Error fetching information';
                 }
+            }
+
+            function refreshData() {
+                fetchCustomerAndOrderInfo();
+            }
+
+            function sendEmail() {
+                alert('Email functionality is not yet implemented.');
             }
 
             fetchCustomerAndOrderInfo();
