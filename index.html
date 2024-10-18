@@ -34,11 +34,11 @@
         <script src="https://missiveapp.com/open/missive.js"></script>
         <script>
             // Function to update the conversation ID in the span
-            function updateConversationId(conversation) {
+            function updateConversationId(conversationId) {
                 const conversationIdSpan =
                     document.getElementById('conversationId');
-                if (conversation && conversation.id) {
-                    conversationIdSpan.textContent = conversation.id;
+                if (conversationId) {
+                    conversationIdSpan.textContent = conversationId;
                 } else {
                     conversationIdSpan.textContent = 'No conversation selected';
                 }
@@ -49,22 +49,29 @@
                 if (event.data && event.data.type === 'missiveReady') {
                     console.log('Missive API is ready');
 
-                    // Listen for conversation changes
-                    window.Missive.on('conversationChanged', (conversation) => {
-                        updateConversationId(conversation);
-                    });
+                    // Listen for changes to conversations
+                    Missive.on('change:conversations', (ids) => {
+                        // Fetch the conversation details
+                        Missive.fetchConversations(ids)
+                            .then((conversations) => {
+                                if (conversations.length !== 1) {
+                                    // Do nothing if multiple conversations are selected
+                                    updateConversationId(null);
+                                    return;
+                                }
 
-                    // Request the current conversation
-                    window.Missive.getCurrentConversation()
-                        .then((conversation) => {
-                            updateConversationId(conversation);
-                        })
-                        .catch((error) => {
-                            console.error(
-                                'Error getting current conversation:',
-                                error
-                            );
-                        });
+                                // Get the conversation ID and update the span
+                                const conversationId = conversations[0].id;
+                                updateConversationId(conversationId);
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    'Error fetching conversations:',
+                                    error
+                                );
+                                updateConversationId(null);
+                            });
+                    });
                 }
             });
         </script>
