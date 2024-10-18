@@ -76,6 +76,20 @@
                     .querySelector(`[onclick="switchTab('${tabName}')"]`)
                     .classList.add('tab--selected');
             }
+
+            function toggleBox(header) {
+                const box = header.closest('.box-collapsible');
+                const content = box.querySelector('.box-content');
+                const icon = box.querySelector('.icon-menu-right');
+
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    icon.style.transform = 'rotate(90deg)';
+                } else {
+                    content.style.display = 'none';
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            }
         </script>
     </head>
     <body class="margin-small">
@@ -100,6 +114,29 @@
                 <div id="folderInfo" class="tab-content active">
                     <div id="messageInfo">
                         <p>Folder: <span id="folderId"></span></p>
+                    </div>
+                    <div class="box box-collapsible">
+                        <div
+                            class="box-header columns-middle"
+                            onclick="toggleBox(this)"
+                        >
+                            <span class="margin-right-small">
+                                <i
+                                    class="icon icon-menu-right"
+                                    style="width: 6px; height: 10px"
+                                >
+                                    <svg style="width: 24px; height: 24px">
+                                        <use xlink:href="#menu-right" />
+                                    </svg>
+                                </i>
+                            </span>
+                            <span class="column-grow ellipsis"
+                                >Sales Orders</span
+                            >
+                        </div>
+                        <div class="box-content" style="display: none">
+                            <div>Content</div>
+                        </div>
                     </div>
                 </div>
                 <div id="developer" class="tab-content">
