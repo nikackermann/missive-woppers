@@ -25,27 +25,46 @@
                 </div>
             </div>
             <div class="tabs-content light-box padding">
-                <div>Conversation Id: <span id="conversation-id"></span></div>
+                <p>
+                    Current Conversation ID:
+                    <span id="conversationId">Loading...</span>
+                </p>
             </div>
         </div>
         <script src="https://missiveapp.com/open/missive.js"></script>
         <script>
-            // Wait for the Missive API to be ready
-            missive.onReady(() => {
-                // Get the current conversation
-                const conversation = missive.conversation;
-
-                // Check if the conversation is available
-                if (conversation) {
-                    // Get the conversation ID
-                    const conversationId = conversation.id;
-
-                    // Display the conversation ID in your iFrame app
-                    document.getElementById(
-                        'conversation-id'
-                    ).innerText = `Conversation ID: ${conversationId}`;
+            // Function to update the conversation ID in the span
+            function updateConversationId(conversation) {
+                const conversationIdSpan =
+                    document.getElementById('conversationId');
+                if (conversation && conversation.id) {
+                    conversationIdSpan.textContent = conversation.id;
                 } else {
-                    console.log('No conversation found.');
+                    conversationIdSpan.textContent = 'No conversation selected';
+                }
+            }
+
+            // Wait for the Missive API to be ready
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'missiveReady') {
+                    console.log('Missive API is ready');
+
+                    // Listen for conversation changes
+                    window.Missive.on('conversationChanged', (conversation) => {
+                        updateConversationId(conversation);
+                    });
+
+                    // Request the current conversation
+                    window.Missive.getCurrentConversation()
+                        .then((conversation) => {
+                            updateConversationId(conversation);
+                        })
+                        .catch((error) => {
+                            console.error(
+                                'Error getting current conversation:',
+                                error
+                            );
+                        });
                 }
             });
         </script>
