@@ -3,136 +3,101 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>WOPPERS - Customer & Order Info</title>
-        <script src="https://integrations.missiveapp.com/missive.js"></script>
-        <link
-            href="https://integrations.missiveapp.com/missive.css"
-            rel="stylesheet"
-        />
+        <title>Missive Task Manager</title>
+        <link rel="stylesheet" href="https://missiveapp.com/open/missive.css" />
+        <script src="https://missiveapp.com/open/missive.js"></script>
         <style>
             body {
-                background-color: var(--color-background);
-                color: var(--color-text);
-                font-family: var(--font-family);
-            }
-            .info-container {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                    Roboto, Helvetica, Arial, sans-serif;
                 padding: 20px;
-                border-radius: var(--border-radius);
-                background-color: var(--color-background-secondary);
-                border: 1px solid var(--color-border);
             }
-            .section {
-                margin-bottom: 20px;
+            #task-list {
+                margin-top: 20px;
             }
-            .section h3 {
-                font-size: 1.2em;
-                color: var(--color-text-secondary);
-                border-bottom: 1px solid var(--color-border);
-                padding-bottom: 5px;
-            }
-            .info-item {
-                padding: 15px;
-                border-radius: var(--border-radius);
-                background-color: var(--color-background-tertiary);
-                border: 1px solid var(--color-border);
+            .task-item {
                 margin-bottom: 10px;
-                box-shadow: var(--box-shadow);
-            }
-            .info-item p {
-                margin: 5px 0;
-            }
-            .button {
-                display: inline-block;
-                padding: 10px 15px;
-                background-color: var(--color-primary);
-                color: var(--color-on-primary);
-                border: none;
-                border-radius: var(--border-radius);
-                cursor: pointer;
-                font-size: 1em;
-                text-align: center;
-                transition: background-color 0.3s;
-            }
-            .button:hover {
-                background-color: var(--color-primary-hover);
-            }
-            .button:active {
-                background-color: var(--color-primary-active);
-            }
-            .button-secondary {
-                background-color: var(--color-background-secondary);
-                color: var(--color-text);
-                border: 1px solid var(--color-border);
             }
         </style>
     </head>
     <body>
-        <div class="info-container">
-            <div class="section">
-                <h3>Customer Information</h3>
-                <div id="customer-info" class="info-item">Loading...</div>
-            </div>
-            <div class="section">
-                <h3>Order Information</h3>
-                <div id="order-info" class="info-item">Loading...</div>
-            </div>
-            <div class="section">
-                <button class="button" onclick="refreshData()">
-                    Refresh Data
-                </button>
-                <button class="button button-secondary" onclick="sendEmail()">
-                    Send Email
-                </button>
-            </div>
+        <h1 class="m-title">Missive Task Manager</h1>
+
+        <div class="m-form-group">
+            <label for="task-input" class="m-label">New Task</label>
+            <input
+                type="text"
+                id="task-input"
+                class="m-input"
+                placeholder="Enter a new task"
+            />
         </div>
+
+        <div class="m-form-group">
+            <label for="priority-select" class="m-label">Priority</label>
+            <select id="priority-select" class="m-select">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+
+        <button id="add-task" class="m-button m-button--primary">
+            Add Task
+        </button>
+
+        <div id="task-list"></div>
+
         <script>
-            async function fetchCustomerAndOrderInfo() {
-                const emailId = new URLSearchParams(window.location.search).get(
-                    'emailId'
-                );
-                if (!emailId) {
-                    document.getElementById('customer-info').textContent =
-                        'Email ID not found';
-                    return;
+            const taskInput = document.getElementById('task-input');
+            const prioritySelect = document.getElementById('priority-select');
+            const addTaskButton = document.getElementById('add-task');
+            const taskList = document.getElementById('task-list');
+
+            addTaskButton.addEventListener('click', addTask);
+
+            function addTask() {
+                const taskText = taskInput.value.trim();
+                const priority = prioritySelect.value;
+
+                if (taskText) {
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'm-checkbox';
+
+                    const label = document.createElement('label');
+                    label.className = 'm-label';
+                    label.appendChild(checkbox);
+
+                    const taskSpan = document.createElement('span');
+                    taskSpan.textContent = taskText;
+                    label.appendChild(taskSpan);
+
+                    taskItem.appendChild(label);
+
+                    const priorityBadge = document.createElement('span');
+                    priorityBadge.className = `m-badge m-badge--${priority}`;
+                    priorityBadge.textContent =
+                        priority.charAt(0).toUpperCase() + priority.slice(1);
+                    taskItem.appendChild(priorityBadge);
+
+                    taskList.appendChild(taskItem);
+
+                    taskInput.value = '';
+                    prioritySelect.value = 'low';
+
+                    Missive.setSize();
                 }
-
-                try {
-                    const response = await fetch(
-                        `/api/customer-info?emailId=${emailId}`,
-                        {
-                            headers: {
-                                'Missive-Auth': 'YOUR_AUTH_TOKEN', // Replace with actual token handling
-                            },
-                        }
-                    );
-
-                    const data = await response.json();
-                    document.getElementById('customer-info').innerHTML =
-                        data.customerInfo
-                            ? `<p>Name: ${data.customerInfo.name}</p><p>Email: ${data.customerInfo.email}</p>`
-                            : 'Customer info not available';
-
-                    document.getElementById('order-info').innerHTML =
-                        data.orderInfo
-                            ? `<p>Order ID: ${data.orderInfo.id}</p><p>Status: ${data.orderInfo.status}</p><p>Total: ${data.orderInfo.total}</p>`
-                            : 'Order info not available';
-                } catch (error) {
-                    document.getElementById('customer-info').textContent =
-                        'Error fetching information';
-                    document.getElementById('order-info').textContent =
-                        'Error fetching information';
-                }
             }
 
-            function refreshData() {
-                fetchCustomerAndOrderInfo();
-            }
-
-            function sendEmail() {
-                alert('Email functionality is not yet implemented.');
-            }
-
-            fetchCustomerAndOrderInfo();
+            // Initialize Missive
+            Missive.on('ready', function () {
+                console.log('Missive is ready');
+                Missive.setSize();
+            });
         </script>
     </body>
 </html>
