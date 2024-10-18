@@ -15,73 +15,40 @@
             href="https://integrations.missiveapp.com/missive.css"
             rel="stylesheet"
         />
-    </head>
-    <body>
-        <div class="tabs-container">
-            <div class="columns-middle">
-                <div class="tabs light-box columns">
-                    <div class="tab tab--selected">
-                        <span>Customer</span>
-                    </div>
-                    <div class="tab">
-                        <span>Orders</span>
-                    </div>
-                    <div class="tab">
-                        <span>More</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tabs-content light-box padding">
-                <p>
-                    Current Conversation ID:
-                    <span id="conversationId">Loading...</span>
-                </p>
-                <p>Test #2</p>
-            </div>
-        </div>
-        <script src="https://missiveapp.com/open/missive.js"></script>
+        <script src="https://integrations.missiveapp.com/missive.js"></script>
         <script>
-            // Function to update the conversation ID in the span
-            function updateConversationId(conversationId) {
-                const conversationIdSpan =
-                    document.getElementById('conversationId');
-                if (conversationId) {
-                    conversationIdSpan.textContent = conversationId;
-                } else {
-                    conversationIdSpan.textContent = 'No conversation selected';
-                }
-            }
+            Missive.on('change:conversations', (ids) => {
+                Missive.fetchConversations(ids).then((conversations) => {
+                    if (conversations.length != 1) {
+                        // Do nothing if multiple conversations are selected.
+                        return;
+                    }
 
-            // Wait for the Missive API to be ready
-            window.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'missiveReady') {
-                    console.log('Missive API is ready');
+                    var message = conversations[0].latest_message;
+                    if (!message || !message.from_field) {
+                        // Do nothing if conversation has no message (only chat comments) or if
+                        // message has no From field.
+                        return;
+                    }
 
-                    // Listen for changes to conversations
-                    Missive.on('change:conversations', (ids) => {
-                        // Fetch the conversation details
-                        Missive.fetchConversations(ids)
-                            .then((conversations) => {
-                                if (conversations.length !== 1) {
-                                    // Do nothing if multiple conversations are selected
-                                    updateConversationId(null);
-                                    return;
-                                }
-
-                                // Get the conversation ID and update the span
-                                const conversationId = conversations[0].id;
-                                updateConversationId(conversationId);
-                            })
-                            .catch((error) => {
-                                console.error(
-                                    'Error fetching conversations:',
-                                    error
-                                );
-                                updateConversationId(null);
-                            });
-                    });
-                }
+                    var from = message.from_field;
+                    // Update the DOM elements with message information
+                    document.getElementById('fromName').textContent = from.name;
+                    document.getElementById('fromAddress').textContent =
+                        from.address;
+                    document.getElementById('subject').textContent =
+                        message.subject;
+                });
             });
         </script>
+    </head>
+    <body>
+        <div id="messageInfo">
+            <p>
+                From: <span id="fromName"></span> (<span id="fromAddress"></span
+                >)
+            </p>
+            <p>Subject: <span id="subject"></span></p>
+        </div>
     </body>
 </html>
